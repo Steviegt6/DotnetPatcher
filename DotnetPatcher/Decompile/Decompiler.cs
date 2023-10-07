@@ -78,9 +78,29 @@ namespace DotnetPatcher.Decompile
 			{
 				foreach (string lib in decompiledLibraries)
 				{
-					Resource libRes = mainModule.Resources.Single(r => r.Name.EndsWith(lib + ".dll"));
-					ProjectFileUtility.AddEmbeddedLibrary(libRes, SourceOutputDirectory, projectDecompiler, decompilerSettings, projectDecompiler.AssemblyResolver, items);
-					exclude.Add(DirectoryUtility.GetOutputPath(libRes.Name, mainModule));
+					Resource libRes = mainModule.Resources.SingleOrDefault(r => r.Name.EndsWith(lib + ".dll"));
+					if (libRes is not null)
+					{
+						ProjectFileUtility.AddEmbeddedLibrary(libRes, SourceOutputDirectory, projectDecompiler, decompilerSettings, projectDecompiler.AssemblyResolver, items);
+						exclude.Add(DirectoryUtility.GetOutputPath(libRes.Name, mainModule));	
+					}
+					else
+					{
+						IAssemblyReference asmRef = mainModule.AssemblyReferences.SingleOrDefault(r => r.Name == lib);
+
+						if (asmRef is not null)
+						{
+							PEFile temporaryModule = projectDecompiler.AssemblyResolver.ResolveModule(mainModule, asmRef.Name + ".dll");
+							using Stream s = File.OpenRead(temporaryModule.FileName);
+							PEFile libModule = new PEFile(asmRef.Name, s, PEStreamOptions.PrefetchEntireImage);
+							ProjectFileUtility.AddLibrary(libModule, SourceOutputDirectory, projectDecompiler, decompilerSettings, projectDecompiler.AssemblyResolver, items);
+							exclude.Add(DirectoryUtility.GetOutputPath($"Terraria.Libraries.{libModule.Name}.{libModule.Name}.dll", mainModule));
+						}
+						else
+						{
+							Console.WriteLine("Could not find library: " + lib);
+						}
+					}
 				}
 			}
 

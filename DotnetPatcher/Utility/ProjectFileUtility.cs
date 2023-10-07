@@ -139,7 +139,11 @@ namespace DotnetPatcher.Utility
 			using Stream s = res.TryOpenStream();
 			s.Position = 0;
 			PEFile module = new PEFile(res.Name, s, PEStreamOptions.PrefetchEntireImage);
+			AddLibrary(module, projectOutputDirectory, decompiler, settings, resolver, items);
+		}
 
+		public static void AddLibrary(PEFile module, string projectOutputDirectory, DecompilerUtility.ExtendedProjectDecompiler decompiler, DecompilerSettings settings, IAssemblyResolver resolver, List<WorkTask> items)
+		{
 			HashSet<string> files = new HashSet<string>();
 			HashSet<string> resources = new HashSet<string>();
 			DecompilerUtility.DecompileModule(module, resolver, decompiler, items, files, resources, projectOutputDirectory, settings);
