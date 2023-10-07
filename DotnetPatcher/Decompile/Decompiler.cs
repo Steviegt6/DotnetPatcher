@@ -22,19 +22,20 @@ namespace DotnetPatcher.Decompile
 {
 	public class Decompiler
 	{
-		private readonly DecompilerSettings decompilerSettings = new DecompilerSettings(LanguageVersion.Latest)
-		{
-			CSharpFormattingOptions = FormattingOptionsFactory.CreateAllman()
-		};
+		private readonly DecompilerSettings decompilerSettings;
 		private DecompilerUtility.ExtendedProjectDecompiler projectDecompiler;
 
 		public string TargetFile;
 		public string SourceOutputDirectory;
 
-		public Decompiler(string targetFile, string sourceOutputDirectory)
+		public Decompiler(string targetFile, string sourceOutputDirectory, DecompilerSettings? decompilerSettings = null)
 		{
 			this.TargetFile = targetFile;
 			this.SourceOutputDirectory = sourceOutputDirectory;
+			this.decompilerSettings = decompilerSettings
+			                       ?? new DecompilerSettings(LanguageVersion.Latest) {
+				                          CSharpFormattingOptions = FormattingOptionsFactory.CreateAllman(),
+			                          };
 		}
 
 
