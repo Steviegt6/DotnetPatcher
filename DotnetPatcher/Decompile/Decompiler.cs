@@ -65,7 +65,7 @@ namespace DotnetPatcher.Decompile
 
 			PEFile mainModule = ModuleReader.ReadModule(TargetFile, true);
 
-			projectDecompiler = new DecompilerUtility.ExtendedProjectDecompiler(new EmbeddedAssemblyResolver(mainModule, mainModule.Reader.DetectTargetFrameworkId(), SourceOutputDirectory));
+			projectDecompiler = new DecompilerUtility.ExtendedProjectDecompiler(new EmbeddedAssemblyResolver(mainModule, mainModule.DetectTargetFrameworkId(), SourceOutputDirectory));
 			projectDecompiler.Settings.CSharpFormattingOptions = FormattingOptionsFactory.CreateKRStyle();
 
 			List<WorkTask> items = new List<WorkTask>();
